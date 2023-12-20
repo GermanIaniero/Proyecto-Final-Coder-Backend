@@ -2,3 +2,7 @@
 {"level":"http","message":"✅Server escuchando in the port: 8080","timestamp":"2023-12-20T15:34:22.964Z"}
 {"level":"info","message":"DB conectada","timestamp":"2023-12-20T15:35:00.852Z"}
 {"level":"http","message":"✅Server escuchando in the port: 8080","timestamp":"2023-12-20T15:35:00.858Z"}
+{"level":"info","message":"DB conectada","timestamp":"2023-12-20T16:03:43.319Z"}
+{"level":"http","message":"✅Server escuchando in the port: 8080","timestamp":"2023-12-20T16:03:43.324Z"}
+{"level":"info","message":"DB conectada","timestamp":"2023-12-20T16:16:08.293Z"}
+{"level":"http","message":"✅Server escuchando in the port: 8080","timestamp":"2023-12-20T16:16:08.298Z"}
