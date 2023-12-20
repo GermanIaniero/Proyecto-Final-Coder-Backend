@@ -1,58 +1,55 @@
 import express from 'express'
-import config from './config/config.js'
-
-import nodemailer from 'nodemailer'
-import twilio from 'twilio'
-import cors from 'cors'
 import handlebars from 'express-handlebars'
-import path from 'path'
-import exphbs from 'express-handlebars';
-import { fileURLToPath } from 'url'
-import __dirname from "./utils.js";
-//import __dirname from './utils/utils.js'
-import session from 'express-session'
-import passport from 'passport'
-import initializePassport from './config/passport.config.js'
-import { addLogger } from './utils/logger.js'
-import cookieParser from 'cookie-parser'
-import paymentsRouter from './routes/payment.router.js'
-
-
-import swaggerUiExpress from 'swagger-ui-express';
-import { specs } from "./docs/swagger.js";
 import { Server } from "socket.io";
-import MongoStore from "connect-mongo";
 
 import usersRouter from './routes/users.router.js'
 import chatRouter from './routes/chat.router.js'
 import viewsRouter from "./routes/view.router.js";
-
-import productsRouter from "./routes/products.router.js";
+import mailingRouter from "./routes/mailing.router.js";
+import mockingProducts from "./routes/mockingProducts.router.js";
+import ticketsRouter from "./routes/tickets.router.js";
 import cartsRouter from "./routes/carts.router.js";
 import sessionRouter from "./routes/session.router.js";
-import { messageService } from "./services/index.js";
-import { productService } from "./services/index.js";
-import paymentRouter from "./routes/payment.router.js";
+import loggerTest from "./routes/loggerTest.js";
+import paymentsRouter from "./routes/payment.router.js";
+import productsRouter from "./routes/products.router.js";
 
+import __dirname from "./utils.js";
+import mongoose from "mongoose";
+import session from 'express-session'
+import MongoStore from "connect-mongo";
+import initializePassport from './config/passport.config.js'
+import { addLogger, logger  } from './utils/logger.js'
+import passport from 'passport'
+import cookieParser from 'cookie-parser'
+import config from './config/config.js'
 
-const PORT = config.PORT;
+import { specs } from "./docs/swagger.js";
+import swaggerUiExpress from 'swagger-ui-express';
+
+//Data for post JSON
 const app = express()
+app.use(express.json());
+app.use("/static", express.static(__dirname + "/public"));
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser()); 
+app.use(addLogger)  
 
 // Configurar los motores de plantilla
 app.engine("handlebars", handlebars.engine());
 app.set("views", __dirname + "/views");
 app.set("view engine", "handlebars");
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(__dirname + "/public"));
-app.use(addLogger)
-app.use(cors({ origin: "*" }));
 
+//Mongo session
 app.use(
   session({
     store: MongoStore.create({
       mongoUrl: config.DBURL,
       dbName: config.DBNAME,
+      mongoOptions: {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      },
       ttl: process.env.ttl,
     }),
     secret: "CoderSecret",
@@ -61,69 +58,55 @@ app.use(
   })
 );
 
+//Documentacion
+app.use("/apidocs", swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
+
+//Passport
 initializePassport()
 app.use(passport.initialize())
-
 app.use(passport.session());
-app.use(cookieParser("secretForJWT"));    
-app.use(passport.session());
+ 
+//Rutas
 app.use("/", viewsRouter);
 app.use("/", loggerTest);
 app.use("/", mailingRouter);
 
-app.use('/api/session', sessionRouter)
-app.use('/api/carts', cartsRouter)
-app.use('/api/products', productsRouter)
+
+app.use('/api', cartsRouter)
+app.use('/api', productsRouter)
+app.use("/api", mockingProducts);
+app.use('/api', usersRouter)
+app.use("/api", ticketsRouter);
 app.use('/api/payments', paymentsRouter)
-app.use("/api/allproducts", mockingProducts);
-app.use('/api/chat', chatRouter)
+app.use('/api/sessions', sessionRouter)
+//app.use('/api/chat', chatRouter)
+
+//swagger
 app.use("/apidocs", swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
-app.use('/api/users', usersRouter)
-app.use("/api/tickets", ticketsRouter);
 
-const runServer = () => {
-  const httpServer = app.listen(
-    config.PORT,
-    console.log(`✅Server escuchando in the port: ${config.PORT}`)
-  );
+mongoose.set("strictQuery", false);
 
+mongoose
+  .connect(config.DBURL, { dbName: config.DBNAME })
+  .then(() => {
+    logger.info("DB conectada");
+    const httpServer = app.listen(config.PORT, () =>
+      logger.http(`✅Server escuchando in the port: ${config.PORT}`)
+    );
+    const io = new Server(httpServer);
+    let messages = [];
 
-  const io = new Server(httpServer)
+    io.on("connection", (socket) => {
+      socket.on("new-product", async (user) =>
+        logger.info(`${user} se acaba de conectar al chat`)
+      );
 
-  io.on('connection', (socket) => {
-    socket.on('new-product', async data => {
-      try {
-        // const productService.addProduct(data);
-        const products = await productService.getProducts();
-        await productManager.create(data)
-        io.emit('reload-table', products);
-      } catch {
-        console.log(e);
-      }
-    })
-
-    socket.on("delete-product", async (id, email) => {
-      try {
-        await productService.deleteProduct(id, email);
-        const products = await productService.getProducts();
-        io.emit("reload-table", products);
-      } catch (e) {
-        console.log(e);
-      }
-    });
-    socket.on("message", async (data) => {
-      await messageService.saveMessage(data);
-      //Envia el back
-      const messages = await messageService.getMessages();
-      io.emit("messages", messages);
-    });
-    socket.on("disconnect", () => {
-      console.log(`User ${socket.id} disconnected`);
+      socket.on("message", (data) => {
+        messages.push(data);
+        io.emit("logs", messages);
+      });
     });
   })
-}
-
-
-  runServer();
-
-  export default app; 
+  .catch((e) => {
+    logger.fatal("Error al conectar la DB");
+  });

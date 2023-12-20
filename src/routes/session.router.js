@@ -13,6 +13,11 @@ import {
   resetPassword,
   loginGithub
 } from "../controllers/session.controllers.js";
+import {
+  authorizationRol,
+  authorizationStrategy,
+  extractNonSensitiveUserInfo,
+} from "../utils/utils.js";
 import passport from "passport";
 const router = Router();
 

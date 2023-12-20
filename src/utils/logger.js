@@ -1,5 +1,7 @@
 import winston from "winston";
-import { environment } from "./enums/ambient.enums.js";
+//import { environment } from "./enums/ambient.enums.js";
+import config from "../config/config.js"
+let entorno = config.ENVIROMENT;
 
 const customLevelsOptions = {
     levels: {
@@ -20,20 +22,18 @@ const customLevelsOptions = {
       },
 };
 
-const logger = winston.createLogger({
+export const logger = winston.createLogger({
     levels: customLevelsOptions.levels,
     transports: [
         new winston.transports.Console({
-            level: environment.development ? "debug" : "info",
+            level: entorno ? "debug" : "info",
             format: winston.format.combine(
                 winston.format.colorize({ colors: customLevelsOptions.colors }),
                 winston.format.simple()
             ),
         }),
         new winston.transports.File({
-            filename: environment.development
-              ? "./error_dev.log"
-              : "./error_prod.log",
+            filename: "./error.log",
             level: "error",
             format: winston.format.combine(
               winston.format.timestamp(),

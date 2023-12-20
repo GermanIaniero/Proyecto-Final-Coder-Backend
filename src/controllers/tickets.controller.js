@@ -1,6 +1,6 @@
 import { ticketService } from "../services/index.js";
 import config from "../config/config.js";
-import { handleError } from "../utils.js";
+import { handleError } from "../utils/utils.js";
 
 export const createTicket = async (req, res) => {
   try {

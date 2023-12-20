@@ -16,7 +16,7 @@ const router = Router();
 
 router.post(
   "/tickets",
-  passport.authenticate("jwt", { session: false }),
+  authorizationStrategy("jwt", { session: false }),
   authorizationRol(["Usuario", "Premium"]),
   extractNonSensitiveUserInfo,
   createTicket
