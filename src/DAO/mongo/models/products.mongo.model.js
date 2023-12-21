@@ -1,8 +1,6 @@
 import mongoose from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 
-mongoose.set("strictQuery", false);
-
 const ProductSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -40,9 +38,8 @@ const ProductSchema = new mongoose.Schema({
   },
   owner: {
     type: String,
-    required: true,
+    default: "Admin"
   },
-  id: Number,
 });
 
 ProductSchema.plugin(mongoosePaginate);

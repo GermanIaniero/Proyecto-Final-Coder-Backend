@@ -1,6 +1,6 @@
 import CartModel from "./models/carts.mongo.model.js";
 import ProductModel from "./models/products.mongo.model.js";
-import Ticket from "./tickets.mongo.js";
+//import Ticket from "./tickets.mongo.js";
 
 export default class Cart {
   getCarts = async () => {

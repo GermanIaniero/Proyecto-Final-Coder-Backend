@@ -1,217 +1,76 @@
 import { userService } from "../services/index.js";
-import { generateToken } from "../utils.js";
-import { use } from "chai";
+import config from "../config/config.js";
+import { handleError, upload } from "../utils.js";
+import multer from 'multer';
 
-export const getUsers = async (req, res) => {
+//modificar desde el front para que sea dinamico
+const uploadDocuments = upload('profile');
+
+export const createDocuments = async (req, res) => {
   try {
-    const { user } = req.user;
-    if (user.rol === "admin") {
-      const users = await userService.getUsers();
-      res.render("users", { users });
-    } else {
-      const message = {
-        message:
-          "Usted no se encuentra autorizado para realizar dicha operación",
-      };
-      const URI = {
-        URI: "/api/products/products",
-      };
-      res.status(500).render("popUp", { message, URI });
-    }
+    uploadDocuments(req, res, async (err) => {
+      if (err instanceof multer.MulterError) {
+        return res.status(400).json({ message: 'Error al cargar el archivo', error: err.message });
+      } else if (err) {
+        return res.status(500).json({ message: 'Hubo un error al procesar la solicitud', error: err.message });
+      }
+
+      const { id } = req.params;
+      const user = await userService.getUserById(id);
+
+      if (!user) {
+        return res.status(404).json({ message: 'Usuario no encontrado' });
+      }
+
+      const files = req.files;
+      const fileType = req.body.fileType; 
+
+      if (!files || files.length === 0) {
+        return res.status(400).json({ message: 'No se han subido archivos' });
+      }
+
+      user.status = 'file uploaded';
+      await user.save();
+
+      const result = await userService.createDocuments(id, files, fileType);
+      return res.status(200).json(result);
+    });
   } catch (error) {
-    req.logger.fatal("Error al obtener los usuarios");
-    const message = {
-      message: error,
-    };
-    const URI = {
-      URI: "/api/session/login",
-    };
-    res.status(500).render("popUp", { message, URI });
-  }
-
-  //const result = await userService.getUsers()
-};
-
-export const getUserByID = async (req, res) => {
-  const { uid } = req.params;
-  const result = await userService.getUserById(uid);
-
-  res.send({ status: "success", payload: result });
-};
-
-export const getTicketUser = async (req, res) => {
-  try {
-    const id = req.params.uid;
-    const tickets = await userService.getTicketUserById(id);
-    res.render("tickets", { tickets });
-  } catch (e) {
-    const message = {
-      message:
-        "Usted no posee tickets de compra,para verlos por favor haga primero una compra.",
-    };
-    const URI = {
-      URI: "/api/session/login",
-    };
-    res.status(500).render("popUp", { message, URI });
+    return res.status(500).json({ message: 'Hubo un error al procesar la solicitud', error: error.message });
   }
 };
 
-export const createUsers = async (req, res) => {
-  const result = await userService.createUsers(user);
-
-  res.send({ status: "success", payload: result });
-};
-
-export const login = async (req, res) => {
-  const user = req.user;
-
-  //res.send({ status: 'success', payload: result })
-
-  const access_token = generateToken(user);
-
-  res
-    .cookie("coderCookie", access_token, {
-      maxAge: 60 * 60 * 1000,
-      httpOnly: true,
-    })
-    .send({ message: "Logged In!" });
-};
-
-export const logout = async (req, res) => {
-  //const result = await userService.logout()
-  res.clearCookie("coderCookie");
-  return res
-    .status(200)
-    .send({ status: "success", payload: "Logout successful" });
-};
-
-export const register = async (req, res) => {
-  //const result = await userService.createUsers()
-  const user = req.user;
-  res.send({ status: "success", payload: user });
-};
-
-export const deleteUserById = async (req, res) => {
-  /*const uid = req.params.uid
-    const result = await userService.deleteUserById(uid)*/
-
-  try {
-    const { uid } = req.params;
-    const deleteUser = await userService.deleteUser(uid);
-    const message = {
-      message: "Usuario eliminado con exito",
-    };
-    const URI = {
-      URI: "/api/users",
-    };
-    res.status(500).render("popUp", { message, URI });
-  } catch (e) {
-    const message = {
-      message: e,
-    };
-    const URI = {
-      URI: "/api/users",
-    };
-    res.status(500).render("popUp", { message, URI });
-  }
-};
-
-export const getCurrentUser = async (req, res) => {
-  const user = req.user;
-  res.send({ status: "success", payload: user });
-};
-
-export const userPremium = async (req, res) => {
-  try {
-    const uid = req.params.uid;
-    const userDB = await userService.userPremium(uid);
-    res.render("profile", userDB);
-  } catch (error) {
-    req.logger.fatal("Error al cambiar a usuario premium");
-    const message = {
-      message: error,
-    };
-    const URI = {
-      URI: "/api/session/login",
-    };
-    res.status(500).render("popUp", { message, URI });
-  }
-};
-
-export const uploadDocuments = async (req, res) => {
-  try {
-    const uid = req.params.uid;
-    const files = req.files;
-    const userDB = await userService.uploadDocuments(uid, files);
-    const message = {
-      message: "Felicidades, sus documentos han sido subidos con éxito",
-    };
-    const URI = {
-      URI: "/api/session/login",
-    };
-    res.status(200).render("popUp", { message, URI });
-  } catch (error) {
-    const message = {
-      message: error,
-    };
-    const URI = {
-      URI: "/api/session/login",
-    };
-    res.status(500).render("popUp", { message, URI });
-  }
-};
-
-export const uploadDocumentView = async (req, res) => {
-  try {
-    const user = await userService.getUserByEmail(req.user.user.email);
-    const uid = user._id;
-    res.status(200).render("uploadDocuments", { uid });
-  } catch (e) {
-    const message = {
-      message: error,
-    };
-    const URI = {
-      URI: "/api/session/login",
-    };
-    res.status(500).render("popUp", { message, URI });
-  }
-};
-
-export const inactiveUser = async (req, res) => {
-  try {
-    const userDrop = await userService.inactiveUsersDrop();
-    res.status(200).send(userDrop);
-  } catch (e) {
-    const message = {
-      message: e,
-    };
-    const URI = {
-      URI: "/api/session/login",
-    };
-    res.status(500).render("popUp", { message, URI });
-  }
-};
 
 export const createUser = async (req, res) => {
   const user = req.body;
   try {
     const userCreate = userService.createUser(user);
-    //res.send({ status: "success", payload: userCreate });
-    res.status(500).render("popUp", { message, URI });
+    res.send({ status: "success", payload: userCreate });
   } catch (e) {
     req.logger.error("No se pudo crear usuario");
     handleError(config.user_not_add, res);
   }
 };
 
+export const getUsers = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit);
+    const result = await userService.getUsers(limit);
+
+    res.send({ status: "success", payload: result });
+    return result;
+  } catch (error) {
+    req.logger.error("No se pudo obtener usuarios");
+    handleError(config.user_not_found, res);
+  }
+};
 
 export const getUserByEmail = async (req, res) => {
   try {
     const { email } = req?.params?.email;
     const user = await userService.getUserByEmail(email);
 
-    //res.send({ message: "Usuario encontrado", payload: user });
-    res.status(500).render("popUp", { message, URI });
+    res.send({ message: "Usuario encontrado", payload: user });
   } catch (error) {
     req.logger.error("No se pudo obtener usuario por email");
     handleError(config.user_not_found, res);
@@ -223,8 +82,7 @@ export const getUserById = async (req, res) => {
     const id = req.params.id;
     const user = await userService.getUserById(id);
 
-    //res.send({ message: "Usuario encontrado", payload: user });
-    res.status(500).render("popUp", { message, URI });
+    res.send({ message: "Usuario encontrado", payload: user });
   } catch (error) {
     req.logger.error("No se pudo obtener usuario por id");
     handleError(config.user_not_found, res);
@@ -247,8 +105,7 @@ export const updatedUserById = async (req, res) => {
   try {
     const result = await userService.updatedUserById(userId, updatedUser);
 
-    //res.send({ status: "Usuario actualizado exitosamente", payload: result });
-    res.status(500).render("popUp", { message, URI });
+    res.send({ status: "Usuario actualizado exitosamente", payload: result });
   } catch (error) {
     req.logger.error("No se pudo actualizar usuario");
     handleError(config.user_not_update, res);
@@ -283,5 +140,23 @@ export const updatedUserRole = async (req, res) => {
   } catch (error) {
     console.error('Error al actualizar el rol del usuario:', error);
     return res.status(500).json({ message: 'Error al actualizar el rol del usuario', error: error.message });
+  }
+};
+
+
+export const deletedUser = async (req, res) => {
+  const userId = req.params.id;
+  try {
+    const result = await userService.deletedUser(userId);
+
+    if (result) {
+      res.send({ status: "Usuario eliminado exitosamente", payload: result });
+    } else {
+      req.logger.warning("No se pudo eliminar usuario");
+      res.send({ status: "No se pudo eliminar" });
+    }
+  } catch (error) {
+    req.logger.error("Error al eliminar usuario");
+    handleError(config.user_not_delete, res);
   }
 };

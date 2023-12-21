@@ -1,25 +1,15 @@
 export default class TicketRepository {
-  constructor(ticketDao) {
-    this.ticketDao = ticketDao;
+  constructor(dao) {
+    this.dao = dao;
   }
 
-  createTicket= async (data)=> {
-    try {
-      const ticket = await this.ticketDao.createTicket(data);
-      return ticket;
-    } catch (error) {
-      throw error;
-    }
-  }
-  getTicket = async (limit) =>{
-    try {
-      return await this.ticketDao.getTicketById(limit);
-     
-    } catch (e) {
-      throw e;
-    }
-  }
+  createTicket = async (data) => {
+    return await this.dao.createTicket(data);
+  };
 
+  getTickets = async (limit) => {
+    return await this.dao.getTickets(limit);
+  };
 
   getTicketById = async (id) => {
     return await this.dao.getTicketById(id);
@@ -32,6 +22,4 @@ export default class TicketRepository {
   deleteTicket = async (id) => {
     return await this.dao.deleteTicket(id);
   };
-
-
 }

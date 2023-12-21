@@ -3,7 +3,6 @@ import handlebars from 'express-handlebars'
 import { Server } from "socket.io";
 
 import usersRouter from './routes/users.router.js'
-import chatRouter from './routes/chat.router.js'
 import viewsRouter from "./routes/view.router.js";
 import mailingRouter from "./routes/mailing.router.js";
 import mockingProducts from "./routes/mockingProducts.router.js";

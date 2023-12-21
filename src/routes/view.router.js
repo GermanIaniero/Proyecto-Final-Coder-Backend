@@ -1,20 +1,17 @@
 import { Router } from "express";
-import passport from "passport";
-import { generateToken, generateProducts, authorizationRol, authorizationStrategy } from "../utils/utils.js";
-import { renderLogin, renderRegister } from "../controllers/session.controllers.js";
 import ProductModel from "../DAO/mongo/models/products.mongo.model.js"
+import { authorizationRol, authorizationStrategy } from "../utils.js";
+import passport from "passport";
 import config from "../config/config.js";
 import jwt from "jsonwebtoken";
 
 const router = Router();
 
 //vistas de session
-
 function auth(req, res, next) {
   if (req.user) return res.redirect("/");
   return next();
 }
-
 // Perfil de usuario
 function profile(req, res, next) {
   if (req.user) return next();
@@ -23,7 +20,7 @@ function profile(req, res, next) {
 
 //Iniciar sesión
 router.get("/login", auth, (req, res) => {
-  renderLogin
+  res.render("login", {});
 });
 
 //Reestablecer Pass
@@ -31,6 +28,7 @@ router.get("/resetPass", auth, (req, res) => {
   res.render("resetPass", {});
 });
 
+//Reestablecer Pass
 router.get("/resetPassError", auth, (req, res) => {
   res.render("resetPassError", {});
 });
@@ -52,11 +50,12 @@ router.get("/resetPassConfirm", auth, (req, res) => {
   }
 });
 
+//Registro
 router.get("/register", auth, (req, res) => {
-    renderRegister
+  res.render("register", {});
 });
 
-
+//Perfil
 router.get("/profile", profile, (req, res) => {
   const user = req.user;
   res.render("profile", user);
@@ -66,7 +65,8 @@ router.get("/profile", profile, (req, res) => {
 //Perfil Premium // user: premium@coder.com // contraseña: 1234
 
 //Ruta para admins
-router.get("/admin",
+router.get(
+  "/admin",
   authorizationStrategy("jwt", { session: false }),
   authorizationRol(["Premium", "Admin"]),
   (req, res) => {
@@ -74,13 +74,16 @@ router.get("/admin",
   }
 );
 
-router.get("/login-github",passport.authenticate("github", 
-{ scope: ["user:email"] }),
+//Iniciar session Github
+router.get(
+  "/login-github",
+  passport.authenticate("github", { scope: ["user:email"] }),
   async (req, res) => {}
 );
 
 //Chat socket io
-router.get("/messages",
+router.get(
+  "/messages",
   authorizationStrategy("jwt", { session: false }),
   authorizationRol("Usuario"),
   (req, res) => {
@@ -88,7 +91,8 @@ router.get("/messages",
   }
 );
 
-router.get("/cart",
+router.get(
+  "/cart",
   authorizationStrategy("jwt", { session: false }),
   authorizationRol(["Usuario", "Premium"]),
   (req, res) => {
@@ -102,6 +106,8 @@ router.get("/", async (req, res) => res.render("home", {}));
 //Contacto
 router.get("/contacto", async (req, res) => res.render("contacto", {}));
 
+
+//Ruta PAGINATE PRODUCTS
 router.get("/productos", async (req, res) => {
   const page = parseInt(req.query?.page || 1);
   const limit = parseInt(req.query?.limit || 10);
@@ -139,74 +145,6 @@ router.get("/productos", async (req, res) => {
     return res.status(500).send("Error al enviar products.");
   }
 });
-
-
-
-
-
-
-
-
-
-router.get("/failregister", async (req, res) => {
-  res.send({ error: "failed" });
-});
-
-router.get("/githubcallback",
-  passport.authenticate("github", { failureRedirect: "/" }),
-  async (req, res) => {
-    console.log("Callback: ", req.user);
-    const access_token = generateToken(req.user);
-    res
-      .cookie("keyCookieForJWT", (req.user.token = access_token), {
-        maxAge: 1000 * 60 * 60 * 24 * 30,
-        httpOnly: true,
-      })
-      .redirect("/profile");
-  }
-);
-router.get("/login-google",
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
-    session: false,
-  }),
-  async (req, res) => {}
-);
-
-router.get("/googlecallback",
-  passport.authenticate("google", { failureRedirect: "/" }),
-  async (req, res) => {
-    const access_token = generateToken(req.user);
-    res
-      .cookie("keyCookieForJWT", access_token, {
-        maxAge: 60 * 60 * 1000,
-        httpOnly: true,
-      })
-      .redirect("/profile");
-  }
-);
-
-router.get("/mockingproducts", async (req, res) => {
-  let products = [];
-  for (let i = 0; i < 100; i++) {
-    products.push(generateProducts());
-  }
-  res.send({ status: "success", payload: products });
-});
-
-router.get("/loggerTest", (req, res) => {
-  req.logger.info("Info");
-  req.logger.debug("Debug");
-  req.logger.http("Http");
-  req.logger.error("Error");
-  req.logger.fatal("Fatal");
-  req.logger.warning("Warning");
-  res.send("Logger testing");
-});
-
-
-
-//Ruta PAGINATE PRODUCTS
-
+//127.0.0.1:8080/?page=&limit=7&sortField=price&sortOrder=desc
 
 export default router;

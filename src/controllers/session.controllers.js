@@ -1,111 +1,61 @@
-import { sessionService } from "../services/index.js";
 import { generateToken } from "../utils.js";
-import jwt from "jsonwebtoken";
-import Swal from "sweetalert2";
+import config from "../config/config.js";
+import { userService } from "../services/index.js";
+import bcrypt from "bcrypt";
 
-export const renderLogin = (req, res) => {
-  if (Object.keys(req.cookies).length != 0) return res.redirect("/profile");
-  res.render("login", {})
-}
-
-export const loginUser = async (req, res) => {
+export const registerLocal = async (req, res) => {
   try {
-    const user = await sessionService.loginUser(req.body);
-    if (user == null) {
-      req.logger.error("Error al loguear el usuario");
-      return res.redirect("/login");
-    }
+    const user = await userService.getUserByEmail(req.body.email);
     const access_token = generateToken(user);
-    res
-      .cookie("secretForJWT", (user.token = access_token), {
-        maxAge: 1000 * 60 * 60 * 24 * 30,
-        httpOnly: true,
-      })
-      .render("profile", user);
-  } catch (error) {
-    req.logger.fatal("Error al loguear el usuario");
-    res.status(500).json({ error: error.message });
-  }
-};
 
-export const renderRegister = (req, res) => {
-  if (Object.keys(req.cookies)?.length != 0) return res.redirect("/profile");
-  res.render("register", {})
-}
-
-export const registerUser = async (req, res) => {
-  try {
-    const user = await sessionService.registerUser(req.body);
-    req.logger.info("Usuario registrado");
-    res.redirect("/login");
-  } catch (error) {
-    req.logger.fatal("Error al registrar el usuario");
-    res.status(500).json({ error: error.message });
-  }
-};
-
-export const getUserCurrent = async (req, res) => {
-  try {
-    const user = await sessionService.getUserCurrent(req.user.user);
-    req.logger.info("Usuario obtenido");
-    return res.send({ status: "success", payload: user });
-  } catch (error) {
-    req.logger.fatal("Error al obtener el usuario");
-    res.status(500).json({ error: error.message });
-  }
-};
-
-export const verificarUser = async (req, res) => {
-  try {
-    const token = req.params.token;
-    jwt.verify(token, "secret", async (err, decoded) => {
-      if (err) {
-        req.logger.fatal("Token de verificacion no válido");
-        res.status(500).json({ message: "Token de verificacion no válido" });
-      }
-      await sessionService.verificarUser(decoded);
-      res.render("verificar", {});
+    res.cookie(config.secret_cookie, access_token, {
+      maxAge: 60 * 60 * 10000,
+      httpOnly: true,
     });
+    res.redirect("/profile");
   } catch (error) {
-    req.logger.fatal("Error al verificar el usuario");
-    res.status(500).json({ error: error.message });
+    throw error;
   }
 };
 
-export const resetearPassword = async (req, res) => {
+export const loginLocal = async (req, res) => {
   try {
-    res.render("resetearPassword", {});
+    if (!req.user)
+      return res.status(400).json({ message: "Credenciales inválidas" });
+
+    const user = req.user;
+    user.last_connection = new Date().toLocaleString();
+    await user.save();
+
+    try {
+      const access_token = generateToken(user);
+      res.cookie(config.secret_cookie, access_token, {
+        maxAge: 60 * 60 * 10000,
+        httpOnly: true,
+      });
+      res.redirect("/profile");
+    } catch (error) {
+      throw error;
+    }
   } catch (error) {
-    req.logger.fatal("Error al resetear la contraseña");
-    res.status(500).json({ error: error.message });
+    res.status(500).send("Error en la autenticación: " + error.message);
   }
 };
 
-export const restart = async (req, res) => {
-  const email = req.body.email;
-  await sessionService.validUserSentEmailPassword(email);
-  Swal.fire({
-    title: "Correo enviado",
-    text: "Correo enviado con las instrucciones para restablecer la contraseña",
-    icon: "success",
-  });
-  res.send({
-    status: "success",
-    message: "Email enviado con las instrucciones para cambiar la contraseña",
-  });
-};
+export const loginGithub = async (req, res) => {
+  const user = req.user;
+  user.last_connection = new Date().toLocaleString();
+  await user.save();
 
-export const resetPasswordForm = async (req, res) => {
-  const token = req.params.token;
-  jwt.verify(token, "secret", async (err, decoded) => {
-    if (err) {
-      req.logger.fatal("Token de verificacion no válido");
-      res.status(500).render("resetearPassword");
-    }
-    res.status(200).render("formReset");
-  });
-};
+  const access_token = generateToken(user);
 
+  res
+    .cookie(config.secret_cookie, access_token, {
+      maxAge: 60 * 60 * 10000,
+      httpOnly: true,
+    })
+    .redirect("/profile");
+};
 
 export const resetPassword = async (req, res) => {
   const { email, password } = req.body;
@@ -136,42 +86,32 @@ export const resetPassword = async (req, res) => {
   }
 };
 
-export const validPassword = async (req, res) => {
+export const logout = async (req, res) => {
   try {
-    const password = req.body.newPassword;
-    const email = req.body.email;
-    const confirmpassword = req.body.confirmPassword;
-    await sessionService.resetPasswordForm(email, password, confirmpassword);
-    res.render("login", {});
+    const user = req.user;
+    user.last_connection = new Date().toLocaleString();
+    await user.save();
+
+    const session = req.session;
+
+    session.destroy((err) => {
+      if (err) {
+        console.error("Error al cerrar sesión:", err);
+        res.status(500).json({
+          success: false,
+          message: "Error al cerrar sesión",
+          error: err,
+        });
+      } else {
+        res.clearCookie(config.secret_cookie);
+        res.redirect("/login");
+      }
+    });
   } catch (error) {
-    req.logger.fatal("Error al validar la contraseña");
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Error al cerrar sesión",
+      error: error,
+    });
   }
-};
-
-export const getProfile = async (req, res) => {
-  const { user } = req.user;
-  const userDB = await sessionService.getUserByEmail(user.email);
-  res.status(200).render("profile", userDB);
-};
-
-export const logoutUser = async (req, res) => {
-  const { user } = req.user;
-  await sessionService.setDateController(user);
-  res.clearCookie("keyCookieForJWT").redirect("/api/session/login");
-};
-
-export const loginGithub = async (req, res) => {
-  const user = req.user;
-  user.last_connection = new Date().toLocaleString();
-  await user.save();
-
-  const access_token = generateToken(user);
-
-  res
-    .cookie(config.secret_cookie, access_token, {
-      maxAge: 60 * 60 * 10000,
-      httpOnly: true,
-    })
-    .redirect("/profile");
 };

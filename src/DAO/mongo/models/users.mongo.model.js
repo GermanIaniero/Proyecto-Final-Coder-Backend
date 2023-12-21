@@ -5,14 +5,19 @@ const UserModel = mongoose.model(
   new mongoose.Schema({
     first_name: String,
     last_name: String,
-    email: String,
+    email: { type: String, unique: true },
     age: Number,
-    rol: {
+    roles: {
       type: String,
-      enum: ["user", "admin", "premium"],
-      default: "user",
+      enum: ["Usuario", "Admin", "Premium"],
+      default: "Usuario",
     },
     password: String,
+    documents: [{
+      name: String,
+      fileType: String,
+      reference: String
+    }],
     orders: [
       {
         type: mongoose.SchemaTypes.ObjectId,
@@ -24,9 +29,8 @@ const UserModel = mongoose.model(
       ref: "carts",
     },
     status: {
-      type: "String",
-      enum: ["verified", "not verified"],
-      default: "not verified",
+      type: String,
+      default: "file not uploaded",
     },
     verificationCode: String,
     documents: [
@@ -36,8 +40,8 @@ const UserModel = mongoose.model(
       },
     ],
     last_connection: {
-      type: Date,
-      default: null,
+      type: String,
+      default: ""
     },
     ticketId: [
       {

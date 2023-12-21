@@ -5,15 +5,51 @@ export default class Product extends FileManager {
         super(filename)
     }
 
-    getProducts = async (query = {}) => { return await this.get(query) }
+    getProducts = async (limit) => {
+        if (limit) {
+          const products = await this.getObjects();
+          return products.slice(0, limit);
+        } else {
+          return this.getObjects();
+        }
+      };
     getProductById = async (id) => { return await this.getById(id) }
     createProduct = async (product) => { return await this.set(product) }
     updateProduct = async (id, product) => {
         product.id = id
-        return await this.update(product)
+        return await this.update(id, product)
     }
-    deleteProducts = async (id, product) => {
-        product.id = id
-        return await this.delete(product)
+    deleteProduct = async (id) => {
+        return await this.delete(id)
     }
+
+    addProducts = async (title, description, price, thumbnail) => {
+        const productosAll = await this.getObjects();
+        const newIndex = productosAll.length;
+    
+        const newProduct = {
+          id: newIndex + 1,
+          title,
+          description,
+          price,
+          thumbnail,
+          stock: 80,
+          code: this.generarCode(newIndex),
+        };
+        if (!title || !description || !price || !thumbnail)
+        return console.log("Todos los campos son obligatorios.");
+  
+      const idExiste = productosAll.some(
+        (producto) => producto.id === newProduct.id
+      );
+      if (idExiste) {
+        newProduct.id = +(newProduct.id + "0");
+      }
+  
+      productosAll.push(newProduct);
+  
+      await this.writeObjects(productosAll);
+  
+      return newProduct;
+    };
 }

@@ -1,51 +1,47 @@
 import { Router } from "express";
 import {
-  addProduct,
-  getProductsRealTime,
-  updateProducts,
-  deleteProducts,
+  addProducts,
+  deletedProduct,
+  getProductById,
   getProducts,
-  getProductByID
+  updatedProductById,
 } from "../controllers/products.controller.js";
 import {
+  authorizationProduct,
   authorizationRol,
   authorizationStrategy,
-  extractNonSensitiveUserInfo,
-} from "../utils/utils.js";
-import passport from "passport";
+} from "../utils.js";
 
 const router = Router();
 
-router.post("/", passport.authenticate("jwt", { session: false }), authorizationRol(["Premium", "Admin"]), 
-addProduct);
+router.get("/products", getProducts);
+// http://127.0.0.1:8080/api/products?limit=5
+
+router.post(
+  "/products",
+  authorizationStrategy("jwt", { session: false }),
+  authorizationRol(["Premium", "Admin"]),
+  addProducts
+);
+
+//Perfil admin // user: admin@coder.com // contraseña: 1234
+//Perfil Premium // user: premium@coder.com // contraseña: 1234
+
+router.get("/products/:pid", getProductById);
 
 router.put(
-  "/:pid",
-  passport.authenticate("jwt", { session: false }),
-  updateProducts
+  "/products/:pid",
+  authorizationStrategy("jwt", { session: false }),
+  authorizationRol("Admin"),
+  updatedProductById
 );
+
 router.delete(
-  "/:pid",
-  passport.authenticate("jwt", { session: false }),
-  deleteProducts
-);
-
-router.get(
-  "/realtimeProducts",
-  passport.authenticate("jwt", { session: false }),
-  getProductsRealTime
-);
-
-router.get(
-  "/",
-  passport.authenticate("jwt", { session: false }),
-  getProducts
-);
-
-router.get(
-  "/:pid",
-  passport.authenticate("jwt", { session: false }),
-  getProductByID
+  "/products/:pid",
+  authorizationStrategy("jwt", { session: false }),
+  authorizationRol(["Premium", "Admin"]),
+  authorizationProduct,
+  deletedProduct
 );
 
 export default router;

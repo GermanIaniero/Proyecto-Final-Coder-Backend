@@ -6,9 +6,11 @@ import GitHubStrategy from "passport-github";
 import GoogleStrategy from "passport-google-oauth20";
 import config from "../config/config.js";
 import { userService } from "../services/index.js";
+import { cartService } from "../services/index.js";
+import { logger } from "../utils/logger.js";
 import {
   createHash,
-  isValidPassword,
+  isValidPass,
   extractCookie,
   generateToken,
 } from "../utils.js";
@@ -48,7 +50,7 @@ const validarUser = async (user, profile) => {
 };
 
 
-const initializePassport = () => {
+const initPassport = () => {
   passport.use(
     "jwt",
     new JWTStrategy(
@@ -92,13 +94,37 @@ const initializePassport = () => {
         callbackURL: config.GITHUB_CALLBACKURL,
       },
       async (accessToken, refreshToken, profile, done) => {
+        logger.info(profile);
         try {
-          const email = profile._json.email;
-          const user = await userService.getUserByEmail(email);
-          const result = await validarUser(user, profile);
-          return done(null, result);
+          const user = await userService.getUserByEmail(profile._json.email);
+          const cart = await cartService.createCart();
+
+          if (user) {
+            const token = generateToken(user);
+            user.token = token;
+            logger.info("Usuario existente logueado con github");
+
+            return done(null, user);
+          } else {
+            const newUser = {
+              first_name: profile._json.name,
+              last_name: "",
+              email: profile._json.email,
+              age: 0,
+              password: "",
+              cart: cart._id,
+              roles: "Usuario",
+            };
+
+            const result = await userService.createUser(newUser);
+            logger.info("Nuevo usuario logueado con github");
+
+            const token = generateToken(result);
+            result.token = token;
+            return done(null, result);
+          }
         } catch (e) {
-          return done("Error to login wuth github: " + e);
+          return done("Error de login GITHUB", e);
         }
       }
     )
@@ -147,20 +173,27 @@ const initializePassport = () => {
             return done(null, false);
           }
 
-          if (!isValidPassword(user, password)) {
+          if (!isValidPass(user, password)) {
             console.error("Password not valid");
             return done(null, false);
           }
 
-          return done(null, user);
+          const payload = {
+            sub: user._id,
+            roles: user.roles,
+          };
+
+          const token = generateToken(payload);
+          return done(null, user, { token });
         } catch (e) {
-          return done("Error login " + e);
+          console.log(e)
+          return done("Error de login LOCAL", e);
         }
       }
     )
   );
 
-  passport.serializeUser((user, done) => {
+  passport.serializeUser(async (id, done) => {
     done(null, user._id);
   });
 
@@ -170,4 +203,4 @@ const initializePassport = () => {
   });
 };
 
-export default initializePassport;
+export default initPassport;

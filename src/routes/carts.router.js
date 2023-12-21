@@ -1,79 +1,58 @@
 import { Router } from "express";
 import {
-  addProductCartByID,
-  deleteProductOneCartById,
-  getCartByUserId,
-  updateProductCartById,
+  addProductCart,
+  createCart,
+  deleteCartById,
+  deleteProductCart,
+  finishPurchase,
+  getCartById,
   getCarts,
-  createCarts,
-  getCartByID,
-  updateCarts,
-  deleteOneCarts,
-  deleteCarts,
-  finishPurchase
 } from "../controllers/carts.controller.js";
-
 import {
   authorizationAddToCart,
   authorizationRol,
   authorizationStrategy,
-} from "../utils/utils.js";
+} from "../utils.js";
 
 const router = Router();
 
-router.get("/", getCarts);
+//Crear carrito nuevo
+router.post("/carts", createCart);
 
-router.get("/:cid", getCartByID);
+//Mostrar todos los carritos
+router.get("/carts", getCarts);
 
-router.post("/:cid/products/:pid", 
+//Mostrar carrito por ID
+router.get("/carts/:cid", getCartById);
+
+// Agregar productos a carrito existente
+router.post(
+  "/carts/:cid/:pid",
   authorizationStrategy("jwt", { session: false }),
   authorizationRol(["Usuario", "Premium"]),
   authorizationAddToCart,
-  updateCarts);
-
-router.delete("/:cid/products/:pid", 
-  authorizationStrategy("jwt", { session: false }),
-  authorizationRol(["Usuario", "Premium"]),
-  deleteOneCarts);
-
-router.delete("/:cid", 
-  authorizationStrategy("jwt", { session: false }),
-  authorizationRol(["Usuario", "Premium"]),
-  deleteCarts);
-
-router.post("/", authorizationStrategy("jwt", { session: false }),
-authorizationRol(["Usuario", "Premium"]), createCarts);
-
-router.get(
-  "/user",
-  authorizationStrategy("jwt", { session: false }),
-  authorizationRol(["Usuario", "Premium"]),
-  getCartByUserId
+  addProductCart
 );
 
-router.get(
-  "/pid/:pid",
+//eliminar product to cart
+router.delete(
+  "/carts/:cid/:pid",
   authorizationStrategy("jwt", { session: false }),
   authorizationRol(["Usuario", "Premium"]),
-  addProductCartByID
+  deleteProductCart
 );
 
-router.get(
-  "/delete/:pid",
+//Eliminar carrito
+router.delete(
+  "/carts/:cid",
   authorizationStrategy("jwt", { session: false }),
   authorizationRol(["Usuario", "Premium"]),
-  deleteProductOneCartById
+  deleteCartById
 );
 
-router.put(
-  "/:cid/product/:pid",
-  authorizationStrategy("jwt", { session: false }),
-  authorizationRol(["Usuario", "Premium"]),
-  updateProductCartById
-);
-
-router.get(
-  "/:cid/purchase",
+//Finalizar compra
+router.post(
+  "/carts/purchase/buy/:cid",
   authorizationStrategy("jwt", { session: false }),
   authorizationRol(["Usuario", "Premium"]),
   finishPurchase

@@ -1,56 +1,34 @@
-import Stripe from "stripe";
-import { paymentService } from "../services/index.js";
+import { paymentService, cartService } from "../services/index.js";
 
-export const creacteCheckout = async (req, res) => {
+export const creacteCheckoutSession = async (req, res) => {
   try {
-    const ticketId = req.query.ticketId;
-    const session = await paymentService.creacteCheckout(ticketId);
-    return res.redirect(session.url);
-  } catch (e) {
-    const message = {
-      message: "Ya ha sido pagado el ticket",
-    };
-    const URI = {
-      URI: "/api/products/products",
-    };
-    res.status(200).render("popUp", { message, URI });
+    const cid = req.params.cid;
+    const cart = await cartService.getCartById(cid);
+
+    const session = await paymentService.createCheckoutSession(
+      cart.products,
+      cid
+    );
+    return res.json(session);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error al crear la sesión de pago" });
   }
 };
 
-export const sucessPayment = async (req, res) => {
+export const paymentSuccess  = async (req, res) => {
   try {
-    const ticketId = req.query.ticketId;
-    const succes = await paymentService.sucessPayment(ticketId);
-    return res.render("sucess", succes);
-  } catch (e) {
-    const message = {
-      message: e,
-    };
-    const URI = {
-      URI: "/api/products/products",
-    };
-    res.status(200).render("popUp", { message, URI });
+    const cid = req.params.cid;
+    const { email } = req.user.user;
+
+    const newTicket = await paymentService.paymentSuccess(cid, email);
+    console.log("ticket controller", newTicket);
+    res.render("success", newTicket);
+  } catch (error) {
+    res.status(500).send("Error al procesar el pago");
   }
 };
 
-export const CancellPayment = async (req, res) => {
-  try {
-    const ticketId = req.query.ticketId;
-    const sucess = await paymentService.cancellPayment(ticketId);
-    const message = {
-      message: "Tu compra ha sido cancelada con exito.",
-    };
-    const URI = {
-      URI: "/api/products/products",
-    };
-    res.status(500).render("popUp", { message, URI });
-  } catch (e) {
-    const message = {
-      message: e,
-    };
-    const URI = {
-      URI: "/api/products/products",
-    };
-    res.status(200).render("popUp", { message, URI });
-  }
+export const paymentCancel = async (req, res) => {
+  res.send("cancel");
 };

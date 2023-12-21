@@ -17,11 +17,3 @@ router.post("/sent-success", sent_success);
 router.post("/sent-contacto", sent_contacto);
 
 export default router;
-
-// attachments: [
-//   {
-//     filename: "zorro.png",
-//     path: `${__dirname}/public/img/zorro.png`,
-//     cid: "img1",
-//   },
-// ],

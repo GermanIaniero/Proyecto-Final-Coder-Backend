@@ -127,11 +127,3 @@ export const sent_contacto = async (req, res) => {
     res.status(500).send("Fallo al enviar el correo electrónico");
   }
 };
-
-// attachments: [
-//   {
-//     filename: "zorro.png",
-//     path: `${__dirname}/public/img/zorro.png`,
-//     cid: "img1",
-//   },
-// ],

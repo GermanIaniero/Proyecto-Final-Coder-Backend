@@ -1,31 +1,57 @@
 import FileManager from "./file.manager.js";
-import Order from "./orders.file.js";
 
 export default class User extends FileManager {
 
     constructor(filename = './db.users.json') {
         super(filename)
     }
-    getUsers = async (populate = false) => { 
-        const users = await this.get()
-        if(populate) {
-            const orders = await this.orderFile.getOrders()
-            for (let i = 0; i < users.length; i++) {
-                const result = []
-                const orderUsers = users[i].orders
-                orderUsers.forEach(oid => {
-                    let order = orders.find(o => o.id = oid)
-                    result.push(order)
-                })
-                users[i].orders = result
-            }
+    getUsers = async (limit) => {
+        if (limit) {
+            const users = await this.getObjects();
+            return users.slice(0, limit);
+        } else {
+            return this.getObjects();
         }
 
-        return users
+    }
+    getUserById = async (id) => { return await this.getById(id) }
+    createUsers = async (data) => {
+        const { first_name, last_name, email, age, password } = data;
+        const usersAll = await this.getObjects();
+        const newIndex = usersAll.length;
 
-        }
-    getUserById = async(id) => { return await this.getById(id) }
-    createUsers = async(user) => {
-       // console.log("local", user)
-        return await this.set(user)}
-}
+        if (!first_name || !email || !password) console.log("Todos los campos son obligatorios.");
+
+        const newUser = {
+            id: newIndex + 1,
+            first_name,
+            last_name: last_name || "",
+            email,
+            age: age || "",
+            password,
+            cart: [],
+            roles: "Usuario",
+        };
+        const idExiste = usersAll.some((user) => user.id === newUser.id);
+        if (idExiste) newUser.id = + (newUser.id + "0");
+
+        usersAll.push(newUser);
+        await this.writeObjects(usersAll);
+        return newUser
+    };
+    getUserByEmail = async (userEmail)=>{
+        const usersAll = await this.getObjects();
+        const user = usersAll.find((user) => user.email === userEmail);
+        if (!user) throw new Error("No se encuentra.")
+        return user;
+      }
+    
+      updatedUserById = async (id, updateUser) =>{
+        return await this.updateObject(id, updateUser);
+      }
+    
+      deletedUser = async (id) => {
+        return await this.deleteObjets(id);
+      };
+    
+}    
