@@ -1,74 +1,21 @@
-<div class="row">
-  <div class="col-md-4 mx-auto">
-    <div class="card bg-black text-white">
-      <div class="card-header pt-5">
-        <h4 class="text-center">
-          Register
-        </h4>
+<div class="wrapper fadeInDown">
+    <div id="formContent">
+      <!-- Tabs Titles -->
+      <h2 class="active"> Register </h2>
+      <!-- Login Form -->
+      <form action="/api/sessions/register" method="post">
+        <input type="text" id="first_name" class="fadeIn second" name="first_name" placeholder="Nombre">
+        <input type="text" id="last_name" class="fadeIn second" name="last_name" placeholder="Apellido">
+        <input type="number" id="age" class="fadeIn second" name="age" placeholder="Edad">
+        <input type="email" id="email" class="fadeIn second" name="email" placeholder="Email">
+        <input type="text" id="password" class="fadeIn third" name="password" placeholder="Clave">
+        <input type="submit" class="fadeIn fourth" value="Registrarse">
+      </form>
+  
+      <!-- Remind Passowrd -->
+      <div id="formFooter">
+        <a class="underlineHover" href="/login">¿Tienes cuenta creada? Haz click aquí</a>
       </div>
-      <div class="card-body">
-        <form autocomplete="off" action="/api/session/register" method="post">
-          <div class="mb-3">
-            <label for="first_name">First Name:</label>
-            <input
-              type="text"
-              class="form-control bg-dark text-white"
-              name="first_name"
-              placeholder="Name"
-            />
-          </div>
-          <div class="mb-3">
-            <label for="last_name">Last Name:</label>
-            <input
-              type="text"
-              class="form-control bg-dark text-white"
-              name="last_name"
-              placeholder="Last Name"
-            />
-          </div>
-          <div class="mb-3">
-            <label for="age">Age:</label>
-            <input
-              type="text"
-              class="form-control bg-dark text-white"
-              name="age"
-              placeholder="Age"
-            />
-          </div>
-          <div class="mb-3">
-            <label for="email">Email:</label>
-            <input
-              type="email"
-              class="form-control bg-dark text-white"
-              name="email"
-              placeholder="Email"
-            />
-          </div>
-          <div class="mb-3">
-            <label for="password">Password</label>
-            <input
-              type="password"
-              class="form-control bg-dark text-white"
-              name="password"
-              placeholder="Password"
-            />
-          </div>
-          <div class="mb-3">
-            <label for="confirm_password">Cofirm Password:</label>
-            <input
-              type="password"
-              class="form-control bg-dark text-white"
-              name="confirm_password"
-              placeholder="Confirm Password"
-            />
-          </div>
-          <button type="submit" class="btn btn-success btn-block">
-            Enviar
-          </button>
-        </form>
-      </div>
-      <p class="text-center">¿Tiene una cuenta creada?
-        <a href="/" class="text-info">Login</a></p>
+  
     </div>
   </div>
-</div>

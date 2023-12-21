@@ -1,5 +1,8 @@
 <html lang="en">
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ECCOMERCE GERMAN</title>
     <link rel="stylesheet" media="all" href="/CSS/stylelogin.css">
     <link rel="stylesheet" media="all" href="/CSS/styleAllProducts.css">
     <link rel="stylesheet" media="all" href="/CSS/style.css">
@@ -19,8 +22,12 @@
                         <button type="submit" title="Search" id="find-btn">Search</button>
                     </div>
                 </form>
-                <a id="customer_login_link" href="/login">Sign In</a>
-                <a id="customer_login_link" href="/logout">Sign Out</a>
+               
+                <a href="/login"><img width="64" height="64" src="https://img.icons8.com/external-bearicons-glyph-bearicons/64/external-log-in-call-to-action-bearicons-glyph-bearicons-1.png" alt="external-log-in-call-to-action-bearicons-glyph-bearicons-1"/></a>
+                <a href="/register"><img width="80" height="80" src="https://img.icons8.com/dotty/80/sign-up-in-calendar.png" alt="sign-up-in-calendar"/></a>
+                <a href="/profile"><img width="50" height="50" src="https://img.icons8.com/ios-filled/50/user-male-circle.png" alt="user-male-circle"/></a>
+                <a href="/api/sessions/logout"><img width="50" height="50" src="https://img.icons8.com/ios-filled/50/logout-rounded-left.png" alt="logout-rounded-left"/></a>
+                
                 <nav role="navigation" aria-label="Catalog">
                     <ul>
                         <li class="nc nav-li-category">
@@ -60,10 +67,58 @@
 
 
   {{{body}}}
-  {{footer}}
-  <script
+
+
+<footer role="contentinfo" aria-label="Footer">
+    <div class="_cont">
+        <div class="socials">
+            <strong>follow us:</strong>
+            <ul>
+                <li><a title="html-koder / test on Twitter" class="tw" target="_blank">Twitter</a></li>
+                <li><a title="html-koder / test on Facebook" class="fb" target="_blank">Facebook</a></li>
+                <li><a title="html-koder / test on Instagram" class="in" target="_blank">Instagram</a></li>
+                <li><a title="html-koder / test on Pinterest" class="pi" target="_blank">Pinterest</a></li>
+            </ul>
+        </div>
+        <div class="top">
+            <div class="right">
+
+                <form class="contact-form" accept-charset="UTF-8">
+                    <input type="hidden" value="customer" name="form_type" /><input type="hidden" name="utf8"
+                        value="✓" />
+                    <div>
+                        <input type="hidden" id="contact_tags" name="contact[tags]" value="newsletter" />
+                        <input type="text" id="contact_email" name="contact[email]"
+                            placeholder="Suscribite por e-mail para las especiales ofertas...">
+                        <button type="submit" title="Newsletter Signup">OK</button>
+                    </div>
+                </form>
+            </div>
+            <div class="left">
+                <span class="phone">+549 351 2404821</span>
+                <a class="mail" href="mailto:ecommerce@dominio.com">ecommerce@dominio.com</a>
+            </div>
+        </div>
+        <div class="bottom">
+            <div class="left">
+                <nav role="navigation" aria-label="Service menu">
+                    <ul>
+                        <li><a>Home</a></li>
+                        <li><a>Manage</a></li>
+                        <li><a>Support</a></li>
+                        <li><a>Products</a></li>
+                        <li><a>Cart</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</footer>
+
+  <script src="/static/js/cart-assets.js"></script>
+  <script>
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
     crossorigin="anonymous"
-  ></script>
+  </script>
 </html>

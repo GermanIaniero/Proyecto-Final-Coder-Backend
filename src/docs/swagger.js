@@ -30,7 +30,7 @@ export const swaggerOptions = {
               Repositorio de github del proyecto: https://github.com/GermanIaniero/Proyecto-Final-Coder-Backend \n
               Información de contacto: \n
               * Email: german_danielianiero@hotmail.com
-              * Linkedin: https://www.linkedin.com/in/
+              * Linkedin: https://www.linkedin.com/in/german-ianierook/
               * Github: https://github.com/GermanIaniero'
               `,
         } 
