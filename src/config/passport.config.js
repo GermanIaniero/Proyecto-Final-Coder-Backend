@@ -18,7 +18,7 @@ import {
 const LocalStrategy = local.Strategy;
 
 const JWTStrategy = passportJWT.Strategy;
-const JWTextract = passportJWT.ExtractJwt;
+const ExtractJwt = passportJWT.ExtractJwt;
 
 const validarUser = async (user, profile) => {
   if (user) {
@@ -55,8 +55,8 @@ const initPassport = () => {
     "jwt",
     new JWTStrategy(
       {
-        jwtFromRequest: JWTextract.fromExtractors([extractCookie]),
-        secretOrKey: "secretForJWT",
+        jwtFromRequest: ExtractJwt.fromExtractors([extractCookie]),
+        secretOrKey: config. PRIVATE_KEY,
       },
       async (jwt_payload, done) => {
         return done(null, jwt_payload);
@@ -64,7 +64,7 @@ const initPassport = () => {
     )
   );
 
-  passport.use(
+  /*passport.use(
     "google",
     new GoogleStrategy(
       {
@@ -83,7 +83,7 @@ const initPassport = () => {
         }
       }
     )
-  );
+  ); */
 
   passport.use(
     "github",
@@ -143,7 +143,7 @@ const initPassport = () => {
           if (user) {
             return done(null, false);
           }
-          const cart = await cartService.createCarts();
+          const cart = await cartService.createCart();
           const newUser = {
             first_name,
             last_name,
@@ -193,7 +193,7 @@ const initPassport = () => {
     )
   );
 
-  passport.serializeUser(async (id, done) => {
+  passport.serializeUser(async (user, done) => {
     done(null, user._id);
   });
 

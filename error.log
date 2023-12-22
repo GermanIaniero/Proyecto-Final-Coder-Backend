@@ -110,3 +110,31 @@
 {"level":"http","message":"GET /login - 09:12:58","timestamp":"2023-12-22T12:12:58.892Z"}
 {"level":"http","message":"GET /api/sessions/currentuser - 09:12:59","timestamp":"2023-12-22T12:12:59.453Z"}
 {"level":"http","message":"POST / - 09:13:04","timestamp":"2023-12-22T12:13:04.052Z"}
+{"level":"http","message":"GET /home - 11:47:04","timestamp":"2023-12-22T14:47:04.918Z"}
+{"level":"http","message":"GET /api/sessions/home - 11:47:15","timestamp":"2023-12-22T14:47:15.693Z"}
+{"level":"http","message":"GET /home - 13:09:56","timestamp":"2023-12-22T16:09:56.337Z"}
+{"level":"http","message":"GET /login - 13:10:05","timestamp":"2023-12-22T16:10:05.106Z"}
+{"level":"http","message":"GET /api/sessions/currentuser - 13:10:05","timestamp":"2023-12-22T16:10:05.530Z"}
+{"level":"http","message":"POST / - 13:10:28","timestamp":"2023-12-22T16:10:28.081Z"}
+{"level":"http","message":"POST / - 13:11:38","timestamp":"2023-12-22T16:11:38.661Z"}
+{"level":"http","message":"GET /login - 13:11:43","timestamp":"2023-12-22T16:11:43.060Z"}
+{"level":"http","message":"GET /api/sessions/currentuser - 13:11:43","timestamp":"2023-12-22T16:11:43.316Z"}
+{"level":"http","message":"POST /api/sessions/login - 13:11:46","timestamp":"2023-12-22T16:11:46.287Z"}
+{"level":"http","message":"GET /api/sessions/login - 13:12:11","timestamp":"2023-12-22T16:12:11.579Z"}
+{"level":"http","message":"GET /api/sessions/login - 13:12:25","timestamp":"2023-12-22T16:12:25.343Z"}
+{"level":"info","message":"DB conectada","timestamp":"2023-12-22T16:28:19.490Z"}
+{"level":"http","message":"✅Server escuchando in the port: 8080","timestamp":"2023-12-22T16:28:19.495Z"}
+{"level":"http","message":"GET /api/sessions/login - 13:28:35","timestamp":"2023-12-22T16:28:35.622Z"}
+{"level":"http","message":"GET /api/sessions/login - 13:28:40","timestamp":"2023-12-22T16:28:40.473Z"}
+{"level":"http","message":"GET /api/sessions/login - 13:28:52","timestamp":"2023-12-22T16:28:52.474Z"}
+{"level":"http","message":"GET /api/session/login - 13:29:05","timestamp":"2023-12-22T16:29:05.182Z"}
+{"level":"http","message":"GET /login - 13:29:13","timestamp":"2023-12-22T16:29:13.744Z"}
+{"level":"http","message":"GET /api/sessions/currentuser - 13:29:14","timestamp":"2023-12-22T16:29:14.181Z"}
+{"level":"http","message":"GET /favicon.ico - 13:29:14","timestamp":"2023-12-22T16:29:14.302Z"}
+{"level":"http","message":"POST /api/sessions/login - 13:29:18","timestamp":"2023-12-22T16:29:18.279Z"}
+{"level":"info","message":"DB conectada","timestamp":"2023-12-22T16:36:20.670Z"}
+{"level":"http","message":"✅Server escuchando in the port: 8080","timestamp":"2023-12-22T16:36:20.675Z"}
+{"level":"info","message":"DB conectada","timestamp":"2023-12-22T16:40:11.459Z"}
+{"level":"http","message":"✅Server escuchando in the port: 8080","timestamp":"2023-12-22T16:40:11.465Z"}
+{"level":"info","message":"DB conectada","timestamp":"2023-12-22T16:40:20.930Z"}
+{"level":"http","message":"✅Server escuchando in the port: 8080","timestamp":"2023-12-22T16:40:20.935Z"}

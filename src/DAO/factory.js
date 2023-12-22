@@ -17,7 +17,7 @@ switch (config.PERSISTENCE) {
         })
 
         .then(() => console.log('MongoDB connected'))
-        .catch((err) => CustomError.createError(`Error in MongoDB connection`, err))
+        
 
         const { default: UserMongo } = await import('./mongo/users.mongo.js')
         const { default: ProductMongo } = await import('./mongo/products.mongo.js')

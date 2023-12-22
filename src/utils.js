@@ -22,15 +22,15 @@ export const isValidPass = (user, password) => {
 };
 
 export const generateToken = (user) => {
-  return jwt.sign({ user }, config.secret_jwt, { expiresIn: "24h" });
+  return jwt.sign({ user }, config.PRIVATE_KEY, { expiresIn: "24h" });
 };
 
 export const generateTokenPass = (user) => {
-  return jwt.sign({ user }, config.secret_jwt, { expiresIn: "12h" });
+  return jwt.sign({ user }, config.PRIVATE_KEY, { expiresIn: "12h" });
 };
 
 export const extractCookie = (req) => {
-  return req && req.cookies ? req.cookies[config.secret_cookie] : null;
+  return req && req.cookies ? req.cookies[config.SECRET_COOKIE] : null;
 };
 
 export const authorizationStrategy = (strategy) => {
