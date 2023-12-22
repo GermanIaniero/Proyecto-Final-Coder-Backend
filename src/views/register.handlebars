@@ -1,3 +1,9 @@
+<li><a title="">Register</a></li>
+</ol>
+</div>
+</div>
+</header>
+
 <div class="wrapper fadeInDown">
     <div id="formContent">
       <!-- Tabs Titles -->
@@ -6,16 +12,15 @@
       <form action="/api/sessions/register" method="post">
         <input type="text" id="first_name" class="fadeIn second" name="first_name" placeholder="Nombre">
         <input type="text" id="last_name" class="fadeIn second" name="last_name" placeholder="Apellido">
-        <input type="number" id="age" class="fadeIn second" name="age" placeholder="Edad">
+        <input type="number" id="age" class="fadeIn third" name="age" placeholder="Edad">
         <input type="email" id="email" class="fadeIn second" name="email" placeholder="Email">
-        <input type="text" id="password" class="fadeIn third" name="password" placeholder="Clave">
+        <input type="password" id="password" class="fadeIn third" name="password" placeholder="Clave">
         <input type="submit" class="fadeIn fourth" value="Registrarse">
       </form>
   
-      <!-- Remind Passowrd -->
-      <div id="formFooter">
-        <a class="underlineHover" href="/login">¿Tienes cuenta creada? Haz click aquí</a>
-      </div>
-  
+    <div id="formFooter">
+      <p class="text-center">¿Tienes cuenta creada?</p><a class="underlineHover" href="/login">
+        Haz click aquí</a>
+    </div>
     </div>
   </div>
