@@ -23,8 +23,9 @@ import passport from 'passport'
 import cookieParser from 'cookie-parser'
 import config from './config/config.js'
 
-import { specs } from "./docs/swagger.js";
+//import { specs } from "./docs/swagger.js";
 import swaggerUiExpress from 'swagger-ui-express';
+import swaggerJSDoc from "swagger-jsdoc";
 
 //Data for post JSON
 const app = express()
@@ -57,9 +58,6 @@ app.use(
   })
 );
 
-//Documentacion
-app.use("/apidocs", swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
-
 //Passport
 initializePassport()
 app.use(passport.initialize())
@@ -81,6 +79,18 @@ app.use('/api/sessions', sessionRouter)
 //app.use('/api/chat', chatRouter)
 
 //swagger
+const swaggerOptions = {
+  definition: {
+    openapi: "3.0.1",
+    info: {
+      title: "Documentacion de Ecommerce German",
+      description: "Este proyecto es un Ecommerce de German",
+    },
+  },
+  apis: [`${__dirname}/docs/**/*.yaml`],
+};
+const specs = swaggerJSDoc(swaggerOptions);
+
 app.use("/apidocs", swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
 
 mongoose.set("strictQuery", false);

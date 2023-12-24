@@ -152,7 +152,7 @@ const initPassport = () => {
             password: createHash(password),
             cartid: cart._id,
           };
-          const result = await userService.createUsers(newUser);
+          const result = await userService.createUser(newUser);
           return done(null, result);
         } catch (e) {
           return done("Error to register " + e);

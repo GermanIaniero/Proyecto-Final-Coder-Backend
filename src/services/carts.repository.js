@@ -4,7 +4,7 @@ export default class CartRepository {
   }
 
   createCart = async () => {
-    return await this.dao.createCart();
+    return await this.dao.createCarts();
   };
 
   getCarts = async (limit) => {

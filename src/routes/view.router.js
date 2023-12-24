@@ -101,7 +101,7 @@ router.get(
 );
 
 //Ruta HOME
-router.get("/", async (req, res) => res.render("home", {}));
+router.get("/", async (req, res) => res.render("login", {}));
 
 //Contacto
 router.get("/contacto", async (req, res) => res.render("contacto", {}));
